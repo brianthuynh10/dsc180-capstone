@@ -25,35 +25,37 @@ class Trainer:
         test_dataset=None,
         ):
         """Initialize trainer, model, optimizer, and wandb run."""
-        self.epochs = epochs
-        self.lr = lr
-        self.batch_size = batch_size
-        self.device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        
-
-        print(f"🖥️ Using device: {self.device}")
-        print(f"📦 Hyperparameters | Epochs: {self.epochs}, LR: {self.lr}, Batch Size: {self.batch_size}")
-
-        """Initialize trainer, model, optimizer, and wandb run."""
         self.model = create_model()
-        self.optimizer = torch.optim.Adam(model.parameters(), lr=1e-5)
-        self.epochs = epochs
         self.lr = lr
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
+        self.criterion = nn.L1Loss()
+        self.epochs = epochs
         self.batch_size = batch_size
         self.device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.train_dataset = train_dataset
         self.val_dataset = val_dataset
         self.test_dataset = test_dataset
         self.best_val_loss = float("inf")
+        self.project = project
+        self.run_name = run_name
+        
+
+        print(f"🖥️ Using device: {self.device}")
+        print(f"📦 Hyperparameters | Epochs: {self.epochs}, LR: {self.lr}, Batch Size: {self.batch_size}")
+
+        
+        
+        # Move model to gpu:
+        self.model.to(self.device)
 
         # --- Create output directory ---
         os.makedirs("outputs", exist_ok=True)
 
         # --- Initialize W&B ---
-        wandb.init(project=project, name=run_name, config={
-            "epochs": epochs,
-            "lr": lr,
-            "batch_size": batch_size,
+        wandb.init(project=self.project, name=self.run_name, config={
+            "epochs": self.epochs,
+            "lr": self.lr,
+            "batch_size": self.batch_size,
             "optimizer": "Adam",
             "loss": "MAE"
         })
