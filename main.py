@@ -7,7 +7,7 @@ def main():
 
     # -- Pull Data -- 
     print('Beginning Data Cleaning')
-    train, val, test = clean()  # XRayDataset objects
+    train, val, test, y_mean, y_std = clean()  # XRayDataset objects
 
     # Read hyperparameters from sweep config
     bs = wandb.config.batch_size
@@ -20,6 +20,8 @@ def main():
 
     trainer = Trainer(
         epochs=epochs,
+        train_mean=y_mean,
+        train_std=y_std,
         lr=lr,
         batch_size=bs,
         seed=seed,
@@ -27,6 +29,7 @@ def main():
         val_dataset=val,
         test_dataset=test,
         run_name=f"batch-size-{bs}-seed{seed}"
+
     )
 
     # Track gradients & parameters

@@ -1,3 +1,5 @@
+program: main.py
+
 method: grid
 
 metric:
