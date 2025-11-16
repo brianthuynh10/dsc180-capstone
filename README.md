@@ -1,12 +1,9 @@
 # DSC180 - Quarter 1 Project
 ## Setup
 ### Step 0: Prerequisites
-<ul>
-<li>
-Make sure you have Docker Desktop install on your computer (if not, install here for on [Mac](https://docs.docker.com/desktop/setup/install/mac-install/) or 
+Make sure you have Docker Desktop install on your computer. If not, install here for [Mac](https://docs.docker.com/desktop/setup/install/mac-install/) or 
 [Windows](https://docs.docker.com/desktop/setup/install/mac-install/](https://docs.docker.com/desktop/setup/install/windows-install/ )
-</li> 
-<li>
+
 Create a Weights and Biases account ([here](https://wandb.ai/site/)) 
   <ol type="1"> 
     <li> Once you reach the home page, navigate to the top right corner of your profile and click on it</li>
@@ -14,7 +11,6 @@ Create a Weights and Biases account ([here](https://wandb.ai/site/))
     <li> Copy the key and place it somewhere you'll remember! You can always navigate back to this page if you lose it</li>
   </ol>
 </li>
-</ul>
 
 ### Step 1: Cloning the repository
 Open and paste the following command
