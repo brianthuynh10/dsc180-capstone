@@ -7,23 +7,18 @@ from model_resnet import make_resnet50_model as ResNet152Regression
 import argparse
 import wandb
 
-
-
 def train_epoch(model, loader, criterion, optimizer, device):
     model.train()
     total_loss = 0
     for x, y in loader:
         x, y = x.to(device), y.to(device)
-
         optimizer.zero_grad()
         preds = model(x).squeeze()
         loss = criterion(preds, y)
         loss.backward()
         optimizer.step()
-
         total_loss += loss.item()
     return total_loss / len(loader)
-
 
 def eval_epoch(model, loader, criterion, device):
     model.eval()
@@ -36,20 +31,18 @@ def eval_epoch(model, loader, criterion, device):
             total_loss += loss.item()
     return total_loss / len(loader)
 
-
-def train_at_resolution(img_size):
+def train_at_resolution(img_size, args):
     print(f"\n============================")
     print(f" Training at resolution {img_size}")
     print(f"============================\n")
 
-    BATCH_SIZE = 32
+    BATCH_SIZE = args.batch_size
     LR = 1e-4
-    EPOCHS = 20
+    EPOCHS = args.epochs
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Load datasets
     train_ds, val_ds, test_ds, y_mean, y_std = clean_main(img_size=img_size)
-
     train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
     val_loader   = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
     test_loader  = DataLoader(test_ds, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
@@ -64,11 +57,19 @@ def train_at_resolution(img_size):
     for epoch in range(EPOCHS):
         train_loss = train_epoch(model, train_loader, criterion, optimizer, DEVICE)
         val_loss = eval_epoch(model, val_loader, criterion, DEVICE)
-                # example inside training loop, after computing train_loss and val_loss:
+
+        # W&B logging
         if args.wandb:
-            wandb.log({"img_size": img_size, "epoch": epoch+1, "train_loss": train_loss, "val_loss": val_loss})
+            wandb.log({
+                "img_size": img_size,
+                "epoch": epoch + 1,
+                "train_loss": train_loss,
+                "val_loss": val_loss
+            })
+
         print(f"[{img_size}] Epoch {epoch+1}/{EPOCHS} | Train {train_loss:.4f} | Val {val_loss:.4f}")
 
+        # Save best model
         if val_loss < best_val:
             best_val = val_loss
             torch.save(model.state_dict(), f"resnet_best_{img_size}.pt")
@@ -76,10 +77,12 @@ def train_at_resolution(img_size):
     # Final test loss
     test_loss = eval_epoch(model, test_loader, criterion, DEVICE)
     print(f"[{img_size}] Final Test Loss: {test_loss:.4f}")
+    if args.wandb:
+        wandb.log({"final_test_loss": test_loss})
 
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument('--img_size', type=int, default=224)
+    p.add_argument('--img_size', type=int, default=None, help='Image size (if None, train all resolutions)')
     p.add_argument('--epochs', type=int, default=20)
     p.add_argument('--batch_size', type=int, default=32)
     p.add_argument('--wandb', action='store_true', help='Enable wandb logging')
@@ -87,26 +90,30 @@ def parse_args():
     p.add_argument('--run_name', type=str, default=None)
     return p.parse_args()
 
-
 def main():
     args = parse_args()
 
-    # initialize wandb if requested
+    # Initialize W&B if requested
     if args.wandb:
-        wandb.init(project=args.wandb_project, name=args.run_name or f"res_{args.img_size}", config={
-            "img_size": args.img_size,
-            "epochs": args.epochs,
-            "batch_size": args.batch_size,
-        })
+        wandb.init(
+            entity="zohasan-uc-san-diego-health",  # Your W&B account/team
+            project=args.wandb_project,
+            name=args.run_name or f"res_{args.img_size or 'all'}",
+            config={
+                "img_size": args.img_size,
+                "epochs": args.epochs,
+                "batch_size": args.batch_size
+            }
+        )
 
-    RESOLUTIONS = [args.img_size] if args.img_size else [128,256,512]
+    # Determine resolutions to train
+    RESOLUTIONS = [args.img_size] if args.img_size else [128, 256, 512]
 
     for res in RESOLUTIONS:
-        train_at_resolution(res, args)   # pass args through (see below)
+        train_at_resolution(res, args)  # pass args for W&B logging
 
     if args.wandb:
         wandb.finish()
-
 
 if __name__ == "__main__":
     main()
