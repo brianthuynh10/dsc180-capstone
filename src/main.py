@@ -95,15 +95,15 @@ def main():
 
     if args.wandb:
         wandb.init(
-            project=args.wandb_project,
-            entity="zohasan",
-            name=args.run_name or f"res_{args.img_size or 'multi'}",
-            config={
-                "img_size": args.img_size,
-                "epochs": args.epochs,
-                "batch_size": args.batch_size,
-            }
-        )
+        entity="zohasan",  # your W&B username
+        project="resnet-resolution-study",
+        name=f"res_{args.img_size}",
+        config={
+            "img_size": args.img_size,
+            "epochs": args.epochs,
+            "batch_size": args.batch_size,
+    }
+)
 
     RESOLUTIONS = [args.img_size] if args.img_size else [128, 256, 512]
 
