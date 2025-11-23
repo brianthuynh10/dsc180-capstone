@@ -3,7 +3,7 @@ import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
 from src.clean_data import main as clean_main
-from src.model import create_model
+from src.model_resnet import make_resnet50_model as create_model
 from tqdm import tqdm
 from scipy.stats import pearsonr
 import matplotlib.pyplot as plt
