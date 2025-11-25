@@ -27,7 +27,8 @@ class Trainer:
         train_dataset=None,
         val_dataset=None,
         test_dataset=None,
-        seed=42
+        seed=42,
+        model_depth=16
         ):
 
         """Set random seeds for reproducibility."""
@@ -42,7 +43,8 @@ class Trainer:
         """Initialize trainer, model, optimizer, and wandb run."""
         self.train_mean = train_mean
         self.train_std = train_std
-        self.model = create_model()
+        self.model_depth = model_depth
+        self.model = create_model(model_depth=self.model_depth) 
         self.lr = lr
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
         self.criterion = nn.L1Loss()
@@ -56,6 +58,7 @@ class Trainer:
         self.project = project
         self.run_name = run_name
         self.seed = seed
+        
     
         print(f"Using device: {self.device}")
         print(f"Hyperparameters | Epochs: {self.epochs}, LR: {self.lr}, Batch Size: {self.batch_size}")

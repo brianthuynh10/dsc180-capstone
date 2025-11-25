@@ -8,6 +8,5 @@ __pycache__/
 .DS_Store
 
 # Ignore large datasets
-data/
 models/
 outputs/
