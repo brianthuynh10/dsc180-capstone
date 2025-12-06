@@ -72,8 +72,7 @@ def main():
     train_df, val_df, test_df = pd.read_csv(train_data), pd.read_csv(val_data), pd.read_csv(test_data)
     desired_cols = train_df.columns
 
-    # consistency in columns
-    
+    # consistency in col
     train_df = train_df[desired_cols].set_index('unique_key')
     val_df = val_df[desired_cols].set_index('unique_key')
     test_df = test_df[desired_cols].set_index('unique_key')
