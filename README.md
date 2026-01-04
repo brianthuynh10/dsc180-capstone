@@ -121,10 +121,7 @@ python3 main.py all > log.txt &
 ```
 At some point early in the run, you'll be prompted to enter your W&B API key which will allow you to see training status and the results on the test set. There will also be a `log.txt` file training progress and an output folder the saves the best model incase the process crashes during training.  Once the process is over, you'll be able to see graphs of model's predicitons on the test set and at each step on the validation set. 
 
+## Notes on Data and Usage
 
-
-
-
-
-
-
+This repository is intended for academic coursework only.
+The underlying dataset is subject to institutional restrictions and is not publicly redistributable.
