@@ -7,7 +7,4 @@ __pycache__/
 .ipynb_checkpoints/
 .DS_Store
 
-# Ignore large datasets
-data/
-models/
-outputs/
+

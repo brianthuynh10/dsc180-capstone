@@ -1,0 +1,47 @@
+You are a radiologist’s assistant bot. Extract and report structured information related to [pulmonary edema] from the following chest X-ray report.
+
+Respond strictly in the following format. Use only the options listed below. Do not add extra words, explanations, or categories.
+
+Return your final output as a dictionary with the following keys:
+"Presence", "Severity", and "Change"
+Each key should map to a string.
+
+Example output format:
+{
+"Presence": "present",
+"Severity": "moderate",
+"Change": "increased"
+}
+
+Valid options:
+
+Presence:
+present
+absent
+unknown
+
+Severity:
+NA
+trace
+mild
+moderate
+severe
+unknown
+
+Change:
+stable
+increased
+decreased
+unknown
+NA
+
+Guidelines:
+
+- If pulmonary edema is explicitly ruled out or the lungs are described as clear, set "Presence" to "absent" and set both "Severity" and "Change" to "NA".
+- Findings such as peribronchial cuffing, Kerley B lines, perihilar opacities, or reticular opacities may suggest edema but are not definitive. Use clinical judgment to decide whether these findings represent pulmonary edema versus other processes such as atelectasis or pneumonia.
+- If edema is mentioned but its presence is uncertain or descriptions are ambiguous, set "Presence" to "unknown".
+- If "Presence" is "present", assign "Severity" based on the report. If a severity range is given, choose the greater severity. If severity is not specified or is ambiguous, use "unknown".
+- Assign "Change" only when edema is present. If edema is absent, set "Change" to "NA". If change over time is not described or is ambiguous, set "Change" to "unknown".
+- Do not infer change without explicit comparative language.
+
+### Now read the following radiology report and extract the required fields:
