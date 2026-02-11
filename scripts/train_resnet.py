@@ -9,11 +9,10 @@ def main():
 
     # -- Train Model (using papers setup) -- 
     print('Model created & training will start now')
-    trainer = Trainer(model_name="vgg16", epochs=50, lr=1e-5, batch_size=16, train_dataset = train, val_dataset = val, test_dataset = test, train_mean=y_mean, train_std=y_std)
+    trainer = Trainer(model_name="resnet50", epochs=50, lr=1e-5, batch_size=16, train_dataset = train, val_dataset = val, test_dataset = test, train_mean=y_mean, train_std=y_std)
     # -- This will handle the training loop, validation, and testing --
     trainer.train()
     
 
 if __name__ == "__main__":
     main()
-

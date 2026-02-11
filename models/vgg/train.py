@@ -10,18 +10,19 @@ import wandb
 import os
 import numpy as np
 from sklearn.linear_model import LinearRegression
-from models.vgg.model import make_vgg16_model
+from models.vgg.models import make_vgg16_model, make_resnet50_model
 from models.vgg.evaluate import Evaluator
 
 class Trainer:
     def __init__(
         self,
+        model_name="resnet50",
         epochs=50,
         lr=1e-5,
         batch_size=16,
         train_mean=None,
         train_std=None,
-        project="FIXED-vgg16-xray-regression",
+        project="X-Ray Regression",
         run_name=None,
         device=None,
         train_dataset=None,
@@ -43,7 +44,10 @@ class Trainer:
         # -------------------------
         # Core components
         # -------------------------
-        self.model = make_vgg16_model()
+        if model_name == "vgg16":
+            self.model = make_vgg16_model()
+        elif model_name == "resnet50":
+            self.model = make_resnet50_model()
         self.lr = lr
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
         self.criterion = nn.L1Loss()
@@ -123,7 +127,7 @@ class Trainer:
             train_std=self.train_std,
             val_loader=self.val_loader,
             test_loader=self.test_loader,
-            output_path="outputs/best_model.pt",
+            output_path=f"outputs/best_model_{self.model_name}.pt",
             use_wandb=True,
             wandb_run=wandb,
         )
@@ -135,7 +139,7 @@ class Trainer:
                 "epochs": self.epochs,
                 "learning_rate": self.lr,
                 "batch_size": self.batch_size,
-                "model": "VGG16",
+                "model": "vgg16" if isinstance(self.model, make_vgg16_model().__class__) else "resnet50",
                 "seed": self.seed,
             },
         )
@@ -167,7 +171,7 @@ class Trainer:
             train_r = evaluator._pearson_corr(all_preds, all_labels)
 
             # crash-safe checkpoint
-            torch.save(self.model.state_dict(), "outputs/last_model.pt")
+            torch.save(self.model.state_dict(), f"outputs/last_model_{self.model_name}.pt")
 
             # --- Validation via Evaluator ---
             avg_val_loss, val_r = evaluator.validate(epoch)

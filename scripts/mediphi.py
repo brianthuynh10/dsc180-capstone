@@ -1,5 +1,7 @@
 """
-Docstring for scripts.mediphi
+This script runs the Mediphi model on the given input text and extracts the response dictionary. 
+It reads in a prompt from a text file, applies the model to a sample dataset, and saves the results to a new CSV file. 
+The script is designed to be run as a standalone program.
 """
 # mediphi import 
 from ..models.mediphi import MediphiModel

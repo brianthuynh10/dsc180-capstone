@@ -1,5 +1,5 @@
 import pandas as pd
-import regex as re
+import re
 import numpy as np
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
