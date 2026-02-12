@@ -30,7 +30,6 @@ RUN pip install \
     datasets \
     rich
 
-    
 
 # Set a working directory inside the container
 WORKDIR /workspace

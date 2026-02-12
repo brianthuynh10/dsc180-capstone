@@ -3,7 +3,7 @@ import h5py
 import numpy as np
 import pandas as pd
 from torchvision import transforms
-from models.vgg.XRayDataset import XRayDataset
+from XRayDataset import XRayDataset
 
 """
 Data Cleaning:
@@ -54,8 +54,6 @@ def shrink_image(arr, out_size=256):
 
     return img
 
-
-
 def add_image_data_df(df, file_paths, image_size=256):
     id_set = set(df.index)
     all_images = {}
@@ -72,8 +70,6 @@ def add_image_data_df(df, file_paths, image_size=256):
 
     df["img_arr"] = df.index.map(all_images)
     return df
-
-
 
 # --------------------------------------------------
 # Main pipeline

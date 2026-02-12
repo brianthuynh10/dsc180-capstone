@@ -1,8 +1,8 @@
 # VGG imports 
-from .vgg.data import main as clean 
-from .vgg.train import Trainer
-from .vgg.buildModel import build_grayscale_vgg16, load_model
-from .vgg.models import make_resnet50_model, make_vgg16_model
+from .CNNs.data import main as clean 
+from .CNNs.train import Trainer
+from .CNNs.assembleVGG16 import build_grayscale_vgg16, load_model
+from .CNNs.models import make_resnet50_model, make_vgg16_model
 
 # mediphi imports
 from .mediphi.model import MediPhiModel
