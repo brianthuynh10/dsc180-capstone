@@ -8,4 +8,9 @@ jupyterlab
 tqdm
 h5py
 wandb
+huggingface
+transformers
+peft
+safetensors
+bitsandbytes
 

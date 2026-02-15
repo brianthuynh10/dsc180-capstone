@@ -19,9 +19,8 @@ clinically grounded, human-readable explanations aligned with radiology-report r
 
 ## Repository Structure
 
-- `src/`  
-  Core Python modules for data preprocessing, dataset construction,
-  model definition, and training.
+- `interpretability/`  
+  Folder consisiting of explainability methods implemented that we chose to use for our experiements on CNNs of LLMs
 
 - `notebooks/part1/`  
   Exploratory analysis and modeling notebooks used in Quarter 1,
@@ -37,8 +36,11 @@ clinically grounded, human-readable explanations aligned with radiology-report r
 - `reports/part2/`  
   Quarter 2 proposal and final report (interpretability extension).
 
-- `main.py`  
-  Entry point for training and running experiments on DSMLP.
+-  `models/`
+  Models we used for our explainability experiments. Broken into `/MediPhi` and `/CNNs` - where `/MediPhi` contains scripts to help assemble the fine-tuned model and generate labels for an inputted reports. `CNNs` consists of scripts to preprocess image data and train ResNet50 or VGG16 models. 
+
+- `scripts/` 
+  Scripts for running the fine-tuned MediPhi model or start training ResNet50 or VGG16. 
 
 - `Dockerfile`, `requirements.txt`  
   Environment configuration for reproducible execution.
