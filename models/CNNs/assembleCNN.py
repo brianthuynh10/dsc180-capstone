@@ -11,7 +11,7 @@ def build_grayscale_cnn(out_dim=1, model_name="resnet50"):
     if model_name == "resnet50":
         # path for the ResNet weights: 
        
-        model = models.resnet50(pretrained=False)
+        model = models.resnet50(weights=None)
         # --- Convert first conv layer to grayscale ---
         model.conv1 = nn.Conv2d(
             in_channels=1,
@@ -44,7 +44,7 @@ def build_grayscale_cnn(out_dim=1, model_name="resnet50"):
 
     elif model_name == "vgg16": 
 
-        model = models.vgg16(pretrained=False)
+        model = models.vgg16(weights=None)
         model.features[0] = nn.Conv2d(
             in_channels=1,
             out_channels=64,

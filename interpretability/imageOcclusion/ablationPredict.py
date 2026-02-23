@@ -7,14 +7,17 @@ import os
 STD = 0.8821057040979827
 AVG = 2.9434068584972755
 
-def run_ablation_patch_across_image(model, predictions_df, model_name): 
-    base = os.path.expanduser('~/teams/b1/ablation_predictions')
+def run_ablation_patch_across_image(model, predictions_df, model_name, patch_size): 
+    # create the output path needed
+    base = os.path.expanduser(f'~/teams/b1/ablation_predictions/{model_name}_ablations_patch_{patch_size}')
+    os.makedirs(base, exist_ok=True) 
+    
     # setup the model 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     model.eval()
     # helper for generating the patches
-    def generate_patch_coords(img_size=256, patch_size=64, stride=64):
+    def generate_patch_coords(img_size=256, patch_size=patch_size, stride=patch_size):
         coords = []
         for r in range(0, img_size, stride):
             for c in range(0, img_size, stride):

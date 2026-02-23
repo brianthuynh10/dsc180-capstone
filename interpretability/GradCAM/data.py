@@ -70,7 +70,6 @@ def create_groups(df: pd.DataFrame):
 
     return groups
 
-
 def grab_labeled_bnpp_reports(path='~/teams/b1/bnpp-reports-clean.csv'):
     """
     Load cleaned BNP reports CSV.

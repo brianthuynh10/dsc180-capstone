@@ -18,10 +18,9 @@ class GradCAMWrapper:
         self.target_layer = target_layer
         self.alpha_min = alpha_min
         self.alpha_max = alpha_max
-
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model.to(self.device).eval()
 
+        self.model.to(self.device).eval()
         # create GradCAM ONCE
         self.cam = GradCAM(
             model=self.model,
@@ -38,16 +37,13 @@ class GradCAMWrapper:
 
         cam_map = grayscale_cam[0]  # (H, W)
         cam_map = np.maximum(cam_map, 0)
-        cam_map = cam_map ** 0.5    # you can tune this
-
         return cam_map
 
     def _overlay_cam(self, cam, img):
         alpha_map = self.alpha_min + (self.alpha_max - self.alpha_min) * cam[..., None]
-
         heatmap = cv2.applyColorMap(
             np.uint8(255 * cam),
-            cv2.COLORMAP_TURBO
+            cv2.COLORMAP_JET
         ).astype(np.float32) / 255.0
 
         img_rgb = np.stack([img, img, img], axis=-1)
@@ -57,11 +53,9 @@ class GradCAMWrapper:
     def build_cam_map(self, cam, img_tensor):
         img = img_tensor[0, 0].detach().cpu().numpy()
         img = (img - img.min()) / (img.max() - img.min() + 1e-8)
-
         cam = self._normalize_cam(cam, p_low=30, p_high=99)
         cam = cv2.resize(cam, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_CUBIC)
         cam = cv2.GaussianBlur(cam, (5, 5), 0)
-
         return self._overlay_cam(cam, img)
 
     def generate_average_cam(self, grouped_df: pd.DataFrame, target_size=256):
@@ -73,7 +67,7 @@ class GradCAMWrapper:
                 hdf5_file, hdf5_key = row['hdf5_file_name']
                 hdf5_path = os.path.join(base_path, hdf5_file + ".hdf5")
             except: 
-                print(f'{row} was a bad')
+                print(f'{row} was bad')
 
             with h5py.File(hdf5_path, "r") as f:
                 img_1024 = f[hdf5_key][()]
@@ -85,9 +79,10 @@ class GradCAMWrapper:
         cam_maps = np.stack(cam_maps, axis=0)
         return cam_maps.mean(axis=0)
 
-    def build_averaged_cam_map(self, average_cam, grouped_df, target_size=256):
+    def build_averaged_cam_map(self, average_cam, grouped_df, target_size=256, normalize=False, global_min=None, global_max=None):
         base_path = os.path.expanduser("~/teams/b1/")
-        hdf5_file, hdf5_key = grouped_df.iloc[0]["hdf5_file_name"]
+        random_row = grouped_df.sample(n=1, random_state=42).iloc[0]
+        hdf5_file, hdf5_key = random_row["hdf5_file_name"]
 
         with h5py.File(os.path.join(base_path, hdf5_file + ".hdf5"), "r") as f:
             img_1024 = f[hdf5_key][()]
@@ -96,7 +91,14 @@ class GradCAMWrapper:
         img = img_tensor[0, 0].detach().cpu().numpy()
         img = (img - img.min()) / (img.max() - img.min() + 1e-8)
 
-        average_cam = self._normalize_cam(average_cam, p_low=30, p_high=99)
+        if normalize:
+            average_cam = self._normalize_cam(average_cam, p_low=30, p_high=99)
+
+        elif global_min is not None and global_max is not None:
+            average_cam = np.clip(average_cam, global_min, global_max)
+            average_cam = (average_cam - global_min) / (global_max - global_min + 1e-8)
+            average_cam = average_cam ** 0.5 
+
         average_cam = cv2.resize(
             average_cam,
             (img.shape[1], img.shape[0]),

@@ -6,28 +6,31 @@ RUN apt-get update && apt-get install -y \
     git wget curl vim build-essential && \
     pip install --upgrade pip
 
-# Install your main Python libraries
+# Core ML stack (PINNED — DO NOT REINSTALL LATER)
 RUN pip install \
-    numpy \
+    torch==2.3.1 \
+    torchvision==0.18.1 \
+    torchaudio==2.3.1 \
+    transformers==4.44.2 \
+    peft==0.18.1 \
+    accelerate==0.30.1 \
+    bitsandbytes==0.43.1 \
+    safetensors==0.4.3 \
+    sentencepiece==0.2.0 \
+    datasets==2.19.0
+
+# General scientific stack (safe to float)
+RUN pip install \
+    numpy==1.26.4 \
     pandas \
     matplotlib \
     scikit-learn \
-    torch \
-    torchvision \
-    wandb \
     scipy \
     h5py \
     tqdm \
-    huggingface \
-    transformers \
-    peft \
-    accelerate \
-    sentencepiece \
+    wandb \
     protobuf \
-    safetensors \
-    bitsandbytes \
     einops \
-    datasets \
     rich
 
 
