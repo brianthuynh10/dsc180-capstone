@@ -44,6 +44,21 @@ python3 -m scripts.runAblation
 ---
 
 ### `mediphi.py`
+<b> Prerequisites: </b>
+If you are running inside DSMLP (without a custom Docker pod), the default environment contains package versions that are incompatible with the MediPhi model and LoRA adapter. To combat that, run these commands below to use the MediPhi model with LoRA adapters.
+
+```
+pip uninstall -y torch torchvision torchaudio transformers peft accelerate numpy
+# Next, 
+pip install \
+  numpy==1.26.4 \
+  torch==2.3.1 \
+  torchvision==0.18.1 \
+  torchaudio==2.3.1 \
+  transformers==4.44.2 \
+  peft \
+  accelerate==0.30.1
+```
 
 Assembles and runs inference using our fine-tuned Microsoft MediPhi model trained on radiology reports.
 

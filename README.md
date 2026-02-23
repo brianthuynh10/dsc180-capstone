@@ -67,10 +67,10 @@ Create a Weights and Biases account ([here](https://wandb.ai/site/))
 ### Step 1: Cloning the repository
 Open and paste the following command
 ```
-git clone https://github.com/brianthuynh10/dsc180-capstone-recreate.git
+git clone https://github.com/brianthuynh10/dsc180-capstone
 ```
 
-### Step 2: Docker Image Setup: 
+### Step 2: Docker Image Setup (Optional, you can use our GitHub Package to run an image on DSMLP): 
 Make sure you have Docker open, then navigate to the repository then use the following command in your terminal, 
 ```
 docker buildx build -platform [TARGET_OS]/[TARGET_CPU] -t [DOCKER_USERNAME]/[IMAGE]:[TAG] [CONTEXT_PATH]
@@ -91,11 +91,12 @@ docker push brianthuynh10/dsc-env:latest
 <b> Make sure your image is public, otherwise DSMLP cannot pull your image! You can change this seting by logging into DockerHub on your browser and changing your image's settings </b> 
 
 ### Step 3: DSMLP Cluster: 
-First you need to SSH into the DSMLP, then once you're in the jumpbox server run the follwing command to ensure you're using the Docker image you created earlier. Note: You can add the tag `-b` if you want to create a background pod because the model will take a while to train
+First you need to SSH into the DSMLP, then once you're in the jumpbox server run the follwing command to ensure you're using the Docker image you created earlier. Note: It is suggested that you use `-b` to create background pod if you plan on training one of the CNNs (`scripts/train_resnet.py` or `scripts/train_vgg.py`) because of very long training times. 
+To launch a background pod
 ```
 launch.sh \
     -W DSC180A_FA25_A00 -G b1100018875 \
-    -i [DOCKER_USERNAME]/[IMAGE]:[TAG] \
+    -i ghcr.io/brianthuynh10/dsc-env:latest \ # or [DOCKER_USERNAME]/[IMAGE]:[TAG] 
     -c [NUMBER_OF_CPUs] -m [SIZE_OF_RAM] -g [NUMBER_OF_GPUs] -v [GPU_VARIANT] \
     -P Always -T -s
 ```
@@ -104,13 +105,19 @@ Example: The configuration below is sufficient to run the model smoothly. Just m
 launch.sh \
     -W DSC180A_FA25_A00 -G b1100018875 \
     -i brianthuynh10/dsc-env:latest \
-    -c 8 -m 32 -g 1 -v 2080ti \
+    -c 8 -m 32 -g 1 -v a30 \
     -P Always -T -s \
+```
+or if you want to access Jupyter Lab: 
+```
+launch-scipy-ml.sh \
+    -W DSC180A_FA25_A00  -G b1100018875 \
+    -c 8 -m 32 -g 1 -v a30
 ```
 ### Step 4: Copying the Repo to DSMLP (if you already did that, skip to step 5)
 If you cloned the repo to your local machine, you'll have to SCP the repo to DSMLP. First we'll need to zip the entire repository using the command: 
 ```
-zip -r [ZIP_FOLDER_NAME].zip dsc180-capstone-recreate
+zip -r [ZIP_FOLDER_NAME].zip dsc180-capstone
 ```
 Then use the following command to send it to DSMLP
 ```
@@ -120,12 +127,12 @@ You should see the file appear in your private folder in DSMLP where you can go 
 ```
 unzip [ZIP_FOLDER_NAME].ZIP
 ```
-### Step 5: Running the Script
-Inside DSMLP, navigate to path of the repo (if you didn't change any names the directory should be `private/dsc180-capstone-recreate`). From there you can run the command,
+### Step 5: Running a Script
+Inside DSMLP, navigate to the path of the repo (if you didn't change any names the directory should be `private/dsc180-capstone`). From there you can run any of the scripts inside the `scripts` folder. For more information on what each script does and how to run each of them, <a href="https://github.com/brianthuynh10/dsc180-capstone/blob/main/scripts/README.md">CLICK HERE</a>. A general guideline on how to run these scripts below: 
 ```
-python3 main.py all > log.txt &
+python3 -m scripts.<script_name> # NO .py! 
 ```
-At some point early in the run, you'll be prompted to enter your W&B API key which will allow you to see training status and the results on the test set. There will also be a `log.txt` file training progress and an output folder the saves the best model incase the process crashes during training.  Once the process is over, you'll be able to see graphs of model's predicitons on the test set and at each step on the validation set. 
+If you are training a model, you'll be prompted to enter your W&B API key which will allow you to see training status and the results on the test set. There will also be a `log.txt` file training progress and an output folder the saves the best model incase the process crashes during training.  Once the process is over, you'll be able to see graphs of model's predicitons on the test set and at each step on the validation set. 
 
 ## Notes on Data and Usage
 
