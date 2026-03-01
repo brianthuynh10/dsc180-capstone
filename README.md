@@ -137,4 +137,8 @@ If you are training a model, you'll be prompted to enter your W&B API key which 
 ## Notes on Data and Usage
 
 This repository is intended for academic coursework only.
-The underlying dataset is subject to institutional restrictions and is not publicly redistributable.
+
+The underlying dataset is subject to institutional restrictions and is not publicly redistributable. 
+As a result, the full training pipeline cannot be executed without authorized access to the data.
+
+Pretrained model weights and example outputs are provided for evaluation purposes.
