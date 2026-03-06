@@ -1,22 +1,21 @@
-import pandas as pd
-import re
-import numpy as np
 import torch
+import pandas as pd
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
 from tqdm import tqdm
 
-class MediPhiModel: 
-    def __init__(self, fine_tuned=True): 
+
+class MediPhiModel:
+    def __init__(self, fine_tuned: bool = True):
         base_model_id = "microsoft/MediPhi"
-        adapter_model_id = "brianthuynh/mediphi-LoRA-Edema" # Your HF repo
+        adapter_model_id = "brianthuynh/mediphi-LoRA-Edema"  # Your HF repo
 
         if fine_tuned:
             print("Loading fine-tuned MediPhi model with LoRA adapter...")
             self.model = AutoModelForCausalLM.from_pretrained(
                 base_model_id,
                 torch_dtype=torch.float16,
-                device_map="auto"
+                device_map="cuda",
             )
             self.tokenizer = AutoTokenizer.from_pretrained(base_model_id)
             self.model = PeftModel.from_pretrained(self.model, adapter_model_id)
@@ -25,14 +24,13 @@ class MediPhiModel:
             self.model = AutoModelForCausalLM.from_pretrained(
                 base_model_id,
                 torch_dtype=torch.float16,
-                device_map="auto"
+                device_map="cuda",
             )
             self.tokenizer = AutoTokenizer.from_pretrained(base_model_id)
-    
+
     def _ask_llm_batch(self, reports, prompt):
         messages = [
-        [{"role": "user", "content": prompt + report}]
-        for report in reports
+            [{"role": "user", "content": prompt + report}] for report in reports
         ]
 
         inputs = self.tokenizer.apply_chat_template(
@@ -54,7 +52,7 @@ class MediPhiModel:
             )
 
         decoded = self.tokenizer.batch_decode(
-            outputs[:, inputs["input_ids"].shape[-1]:],
+            outputs[:, inputs["input_ids"].shape[-1] :],
             skip_special_tokens=True,
         )
 
@@ -62,22 +60,21 @@ class MediPhiModel:
         del inputs, outputs
         torch.cuda.empty_cache()
 
-        return [(d) for d in decoded]
-    
-    
-    def make_predictions(self, prompt, df: pd.DataFrame, BATCH_SIZE=10):
+        return [d for d in decoded]
+
+    def make_predictions(self, prompt, df: pd.DataFrame, batch_size: int = 10):
         """
-        Make predictions on a DataFrame column[ReportClean] of reports using the LLM in batches. 
+        Make predictions on a DataFrame column[ReportClean] using the LLM in batches.
         """
         results = []
 
         total = len(df)
         for i in tqdm(
-            range(0, total, BATCH_SIZE),
+            range(0, total, batch_size),
             desc="Running LLM inference",
             unit="reports",
         ):
-            batch_reports = df["ReportClean"].iloc[i:i + BATCH_SIZE].tolist()
+            batch_reports = df["ReportClean"].iloc[i : i + batch_size].tolist()
             batch_results = self._ask_llm_batch(batch_reports, prompt)
             results.extend(batch_results)
 

@@ -9,6 +9,7 @@ import numpy as np
 from .models import make_vgg16_model, make_resnet50_model
 from .evaluate import Evaluator
 
+
 class Trainer:
     def __init__(
         self,
@@ -69,9 +70,7 @@ class Trainer:
         os.makedirs("outputs", exist_ok=True)
 
         print(f"Using device: {self.device}")
-        print(
-            f"Hyperparameters | Epochs: {epochs}, LR: {lr}, Batch Size: {batch_size}"
-        )
+        print(f"Hyperparameters | Epochs: {epochs}, LR: {lr}, Batch Size: {batch_size}")
 
     # -------------------------
     # Dataloaders
@@ -136,7 +135,11 @@ class Trainer:
                 "epochs": self.epochs,
                 "learning_rate": self.lr,
                 "batch_size": self.batch_size,
-                "model": "vgg16" if isinstance(self.model, make_vgg16_model().__class__) else "resnet50",
+                "model": (
+                    "vgg16"
+                    if isinstance(self.model, make_vgg16_model().__class__)
+                    else "resnet50"
+                ),
                 "seed": self.seed,
             },
         )
@@ -168,7 +171,9 @@ class Trainer:
             train_r = evaluator._pearson_corr(all_preds, all_labels)
 
             # crash-safe checkpoint
-            torch.save(self.model.state_dict(), f"outputs/last_model_{self.model_name}.pt")
+            torch.save(
+                self.model.state_dict(), f"outputs/last_model_{self.model_name}.pt"
+            )
 
             # --- Validation via Evaluator ---
             avg_val_loss, val_r = evaluator.validate(epoch)

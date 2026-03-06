@@ -128,10 +128,39 @@ You should see the file appear in your private folder in DSMLP where you can go 
 unzip [ZIP_FOLDER_NAME].ZIP
 ```
 ### Step 5: Running a Script
-Inside DSMLP, navigate to the path of the repo (if you didn't change any names the directory should be `private/dsc180-capstone`). From there you can run any of the scripts inside the `scripts` folder. For more information on what each script does and how to run each of them, <a href="https://github.com/brianthuynh10/dsc180-capstone/blob/main/scripts/README.md">CLICK HERE</a>. A general guideline on how to run these scripts below: 
+Inside DSMLP, navigate to the path of the repo (if you didn't change any names the directory should be `private/dsc180-capstone`). From there you can run any of the scripts inside the `scripts` folder. Scripts must be run as Python modules using the `-m` flag. Do **not** include the `.py` extension.
+
+#### General Command Format
+```bash
+python3 -m scripts.<script_name>
 ```
-python3 -m scripts.<script_name> # NO .py! 
-```
+
+#### Available Scripts
+- **Train a CNN model** (ResNet50 or VGG16):  
+  ```bash
+  python3 -m scripts.train_cnn resnet50
+  # or
+  python3 -m scripts.train_cnn vgg16
+  ```
+
+- **Run ablation analysis**:  
+  ```bash
+  python3 -m scripts.runAblation resnet50 64
+  # or
+  python3 -m scripts.runAblation vgg16 32
+  ```
+
+- **Run Grad-CAM analysis**:  
+  ```bash
+  python3 -m scripts.runGradCAM
+  ```
+
+- **Run MediPhi inference**:  
+  ```bash
+  python3 -m scripts.mediphi
+  ```
+
+For more details on each script, including prerequisites and options, see the [scripts README](scripts/README.md).
 If you are training a model, you'll be prompted to enter your W&B API key which will allow you to see training status and the results on the test set. There will also be a `log.txt` file training progress and an output folder the saves the best model incase the process crashes during training.  Once the process is over, you'll be able to see graphs of model's predicitons on the test set and at each step on the validation set. 
 
 ## Notes on Data and Usage

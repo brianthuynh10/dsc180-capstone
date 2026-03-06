@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 
+
 class XRayDataset(torch.utils.data.Dataset):
     def __init__(self, images, labels, transform=None):
         """

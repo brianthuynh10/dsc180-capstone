@@ -35,10 +35,9 @@ class AblatedBNPPDataset(Dataset):
         factor = H // target_size
 
         # 1024 -> 256 via 4x4 block averaging
-        img = img_1024.reshape(
-            target_size, factor,
-            target_size, factor
-        ).mean(axis=(1, 3))
+        img = img_1024.reshape(target_size, factor, target_size, factor).mean(
+            axis=(1, 3)
+        )
 
         img = img.astype(np.float32)
 
@@ -65,51 +64,48 @@ class AblatedBNPPDataset(Dataset):
     def _apply_ablation(self, img_tensor):
         if not self.ablate:
             return img_tensor
-    
+
         if self.patch_coords is None:
             raise ValueError("patch_coords must be provided if ablate=True")
-    
+
         r1, r2, c1, c2 = self.patch_coords
-    
+
         assert 0 <= r1 < r2 <= 256
         assert 0 <= c1 < c2 <= 256
-    
+
         img_tensor = img_tensor.clone()
-    
+
         if self.fill_mode == "mean":
             # 0 in normalized space = training mean
             img_tensor[:, r1:r2, c1:c2] = 0.0
-    
+
         elif self.fill_mode == "noise":
             patch = img_tensor[:, r1:r2, c1:c2]
             noise = torch.randn_like(patch) * patch.std() + patch.mean()
             img_tensor[:, r1:r2, c1:c2] = noise
-    
+
         elif self.fill_mode == "blur":
             # simple average pooling blur on region
             patch = img_tensor[:, r1:r2, c1:c2].unsqueeze(0)  # add batch dim
             blurred = torch.nn.functional.avg_pool2d(
-                patch,
-                kernel_size=7,
-                stride=1,
-                padding=3
+                patch, kernel_size=7, stride=1, padding=3
             )
             img_tensor[:, r1:r2, c1:c2] = blurred.squeeze(0)
-    
+
         elif self.fill_mode == "zero_raw":
             # corresponds to raw pixel 0 after normalization
             raw_zero = (0.0 - 0.485) / 0.229
             img_tensor[:, r1:r2, c1:c2] = raw_zero
-    
+
         else:
             raise ValueError(f"Unknown fill_mode: {fill_mode}")
-    
+
         return img_tensor
-    
+
     def _build_key_to_file_map(self):
 
-        hdf5_names = [f'bnpp_frontalonly_1024_{i}' for i in range(1, 11)]
-        hdf5_names.append('bnpp_frontalonly_1024_0_1')
+        hdf5_names = [f"bnpp_frontalonly_1024_{i}" for i in range(1, 11)]
+        hdf5_names.append("bnpp_frontalonly_1024_0_1")
 
         test_keys = set(self.df.index)
         key_to_file = {}
@@ -127,7 +123,7 @@ class AblatedBNPPDataset(Dataset):
                     key_to_file[key] = name
 
         return key_to_file
-    
+
     def __len__(self):
         return len(self.keys)
 

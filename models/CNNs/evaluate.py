@@ -5,6 +5,7 @@ import matplotlib.ticker as ticker
 from scipy.stats import pearsonr
 from sklearn.linear_model import LinearRegression
 
+
 class Evaluator:
     def __init__(
         self,
@@ -61,7 +62,7 @@ class Evaluator:
 
         x_range = np.linspace(log_true.min(), log_true.max(), 100).reshape(-1, 1)
         ax.plot(
-            10 ** x_range,
+            10**x_range,
             10 ** reg.predict(x_range),
             color="red",
             linewidth=2,
@@ -82,12 +83,8 @@ class Evaluator:
 
         ax.xaxis.set_major_locator(ticker.LogLocator(base=10))
         ax.yaxis.set_major_locator(ticker.LogLocator(base=10))
-        ax.xaxis.set_major_formatter(
-            ticker.LogFormatter(base=10, labelOnlyBase=True)
-        )
-        ax.yaxis.set_major_formatter(
-            ticker.LogFormatter(base=10, labelOnlyBase=True)
-        )
+        ax.xaxis.set_major_formatter(ticker.LogFormatter(base=10, labelOnlyBase=True))
+        ax.yaxis.set_major_formatter(ticker.LogFormatter(base=10, labelOnlyBase=True))
 
         ax.legend(frameon=False)
         ax.grid(True, which="both", ls="--", alpha=0.4)

@@ -1,6 +1,7 @@
 import torch.nn as nn
 from torchvision import models
 
+
 def make_vgg16_model(out_dim=1, pretrained=True, freeze=False):
     """
     VGG16 regression model for grayscale X-rays.
@@ -32,7 +33,7 @@ def make_vgg16_model(out_dim=1, pretrained=True, freeze=False):
         nn.Linear(1024, 256),
         nn.ReLU(inplace=True),
         nn.Dropout(0.3),
-        nn.Linear(256, out_dim)
+        nn.Linear(256, out_dim),
     )
 
     return backbone
@@ -45,18 +46,14 @@ def make_resnet50_model(out_dim=1, pretrained=True, freeze=False):
     """
     # --- Load backbone ---
     if pretrained:
-        backbone = models.resnet50(
-            weights=models.ResNet50_Weights.IMAGENET1K_V1
-        )
+        backbone = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
     else:
         backbone = models.resnet50(weights=None)
 
     # --- Convert first conv to grayscale ---
     # Original: Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
     w = backbone.conv1.weight.data.mean(dim=1, keepdim=True)
-    backbone.conv1 = nn.Conv2d(
-        1, 64, kernel_size=7, stride=2, padding=3, bias=False
-    )
+    backbone.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
     backbone.conv1.weight.data = w
 
     # --- Freeze or unfreeze backbone ---
@@ -72,7 +69,7 @@ def make_resnet50_model(out_dim=1, pretrained=True, freeze=False):
         nn.Linear(1024, 256),
         nn.ReLU(inplace=True),
         nn.Dropout(0.3),
-        nn.Linear(256, out_dim)
+        nn.Linear(256, out_dim),
     )
 
     return backbone

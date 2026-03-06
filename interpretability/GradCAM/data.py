@@ -5,14 +5,15 @@ import pandas as pd
 import torch
 import h5py
 from torchvision import transforms
+from config import BASE_PATH, PROCESSED_DATA_PATH
+import ast 
 
 
-def preprocess_image(img_1024, target_size=256): 
+def preprocess_image(img_1024, target_size=256):
     """
     Resize the input image to the target size while maintaining aspect ratio.
     Use the same target_size the model was trained on.
     """
-
     def shrink_image(arr, out_size=target_size):
         H, W = arr.shape
         assert H == W
@@ -31,7 +32,7 @@ def preprocess_image(img_1024, target_size=256):
             img = np.zeros_like(img)
 
         return img
-    
+
     img = shrink_image(img_1024)
 
     # (1, 1, H, W)
@@ -43,48 +44,54 @@ def preprocess_image(img_1024, target_size=256):
     return img
 
 
-def create_groups(df: pd.DataFrame):        
+def create_groups(df: pd.DataFrame):
     """
     Build dictionary mapping edema presence/severity groups.
     """
 
-    absents = df[df['LLM_Output_Presence'].str.contains('absent', na=False)]
-    present = df[df['LLM_Output_Presence'].str.contains('present', na=False)]
+    absents = df[df["LLM_Output_Presence"].str.contains("absent", na=False)]
+    present = df[df["LLM_Output_Presence"].str.contains("present", na=False)]
 
     groups = {"absent": absents}
 
     unique_severities = (
-        present['LLM_Output_Severity']
-        .dropna()
-        .str.lower()
-        .str.strip()
-        .unique()
+        present["LLM_Output_Severity"].dropna().str.lower().str.strip().unique()
     )
 
     for sev in unique_severities:
         groups[f"present_{sev}"] = present[
-            present['LLM_Output_Severity']
-            .str.lower()
-            .str.contains(str(sev), na=False)
+            present["LLM_Output_Severity"].str.lower().str.contains(str(sev), na=False)
         ]
 
     return groups
 
-def grab_labeled_bnpp_reports(path='~/teams/b1/bnpp-reports-clean.csv'):
+
+def load_connected_reports():
+    """
+    Load and preprocess the connected BNPP reports CSV.
+    """
+    full_reports = pd.read_csv(os.path.join(PROCESSED_DATA_PATH, "connected_bnpp_reports.csv"))
+    full_reports.dropna(subset=["hdf5_file_name"], inplace=True)
+    full_reports["hdf5_file_name"] = full_reports["hdf5_file_name"].apply(ast.literal_eval)
+    full_reports["unique_key"] = full_reports["hdf5_file_name"].apply(lambda x: x[1])
+    return full_reports
+
+
+def grab_labeled_bnpp_reports(path=os.path.join(BASE_PATH, "bnpp-reports-clean.csv")):
     """
     Load cleaned BNP reports CSV.
     """
     path = os.path.expanduser(path)
-    return pd.read_csv(path, usecols=['Phonetic','ReportClean', 'LLM_Output'])
+    return pd.read_csv(path, usecols=["Phonetic", "ReportClean", "LLM_Output"])
 
 
-def connect_data(phonetic_name, base="~/teams/b1/"):
+def connect_data(phonetic_name, base=BASE_PATH):
     """
     Given a phonetic name, return (hdf5_file_name, key)
     """
 
-    hdf5_names = [f'bnpp_frontalonly_1024_{i}' for i in range(1, 11)]
-    hdf5_names.append('bnpp_frontalonly_1024_0_1')
+    hdf5_names = [f"bnpp_frontalonly_1024_{i}" for i in range(1, 11)]
+    hdf5_names.append("bnpp_frontalonly_1024_0_1")
 
     base = os.path.expanduser(base)
 

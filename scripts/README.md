@@ -44,6 +44,11 @@ python3 -m scripts.runAblation
 ---
 
 ### `mediphi.py`
+**Command:**
+```bash
+python3 -m scripts.mediphi
+```
+
 <b> Prerequisites: </b>
 If you are running inside DSMLP (without a custom Docker pod), the default environment contains package versions that are incompatible with the MediPhi model and LoRA adapter. To combat that, run these commands below to use the MediPhi model with LoRA adapters.
 
@@ -76,9 +81,21 @@ Quick validation of the fine-tuned language model on report-level data.
 
 Runs our image ablation experiment on the test set.
 
+**Command:**
+```bash
+python3 -m scripts.runAblation <model> <patch_size>
+```
+- `<model>`: Choose `resnet50` or `vgg16`
+- `<patch_size>`: Choose `32` or `64`
+
+**Example:**
+```bash
+python3 -m scripts.runAblation resnet50 32
+```
+
 **What it does:**
 - Applies localized patch ablations to X-ray images
-- Runs ablated images through either VGG16 or ResNet50
+- Runs ablated images through the specified CNN model (our experiments are on image patch size 32)
 - Records predictions for each ablated image
 - Saves outputs as a CSV file (including image ID and predicted value)
 
@@ -88,6 +105,11 @@ Quantifying model sensitivity to specific spatial regions of the image.
 ---
 
 ### `runGradCAM.py`
+
+**Command:**
+```bash
+python3 -m scripts.runGradCAM
+```
 
 Runs the Grad-CAM interpretability pipeline across grouped patient categories.
 
@@ -104,13 +126,25 @@ Understanding where CNN models focus when making regression predictions.
 
 ---
 
-### `train_resnet.py`
+### `train_cnn.py`
 
-Trains a ResNet50 model for X-ray image regression (predicting log-BNPP).
+Trains a CNN model (ResNet50 or VGG16) for X-ray image regression (predicting log-BNPP).
+
+**Command:**
+```bash
+python3 -m scripts.train_cnn <model>
+```
+- `<model>`: Choose `resnet50` or `vgg16`
+
+**Examples:**
+```bash
+python3 -m scripts.train_cnn resnet50
+python3 -m scripts.train_cnn vgg16
+```
 
 **What it does:**
 - Loads training and validation data
-- Trains ResNet50 for regression
+- Trains the specified CNN model for regression
 - Logs training metrics to Weights & Biases
 - Saves:
   - Latest checkpoint (after each epoch)
@@ -120,19 +154,4 @@ Trains a ResNet50 model for X-ray image regression (predicting log-BNPP).
 **Important:**  
 Training may take 1–2 hours depending on GPU availability.  
 We recommend running this in a background pod (e.g., DSMLP GPU instance).
-
----
-
-### `train_vgg.py`
-
-Trains a VGG16 model for X-ray image regression (predicting log-BNPP).
-
-**What it does:**
-- Same pipeline structure as `train_resnet.py`
-- Uses VGG16 backbone instead of ResNet50
-- Logs metrics to Weights & Biases
-- Saves latest and best-performing model checkpoints
-
-**Important:**  
-Also requires GPU resources and may take 1–2 hours.
 
