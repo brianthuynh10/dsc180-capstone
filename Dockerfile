@@ -22,7 +22,7 @@ RUN pip install --upgrade pip
 RUN pip install \
     transformers==4.44.2 \
     peft==0.18.1 \
-    accelerate==0.30.1 \
+    accelerate==0.33.0 \
     bitsandbytes==0.43.1 \
     safetensors==0.4.3 \
     sentencepiece==0.2.0 \

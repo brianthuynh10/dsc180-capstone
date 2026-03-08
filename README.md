@@ -106,7 +106,7 @@ launch.sh \
     -W DSC180A_FA25_A00 -G b1100018875 \
     -i brianthuynh10/dsc-env:latest \
     -c 8 -m 32 -g 1 -v a30 \
-    -P Always -T -s \
+    -P Always -T -s
 ```
 or if you want to access Jupyter Lab: 
 ```
@@ -145,7 +145,7 @@ python3 -m scripts.<script_name>
 
 - **Run ablation analysis**:  
   ```bash
-  python3 -m scripts.runAblation resnet50 64
+  python3 -m scripts.runAblation resnet50 64 # first argument is model, second is ablation patch size
   # or
   python3 -m scripts.runAblation vgg16 32
   ```

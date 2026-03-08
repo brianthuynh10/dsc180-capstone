@@ -3,7 +3,7 @@ import h5py
 import numpy as np
 import pandas as pd
 from torchvision import transforms
-from XRayDataset import XRayDataset
+from .XRayDataset import XRayDataset
 
 """
 Data Cleaning:
